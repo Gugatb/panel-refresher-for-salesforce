@@ -341,6 +341,7 @@ public class App {
 		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
+		driver.manage().window().fullscreen();
 		driver.navigate().to(pUrl);
 		driver.get(pUrl);
 		wait(driver, 30L);

@@ -9,7 +9,7 @@ git config --global user.email "e-mail"
 -----------------------------------------------------------------------------------------
 Create a new repository
 -----------------------------------------------------------------------------------------
-git clone https://github.com/Gugatb/fic_panel_refresher.git
+git clone https://github.com/Gugatb/panel-refresher-for-salesforce.git
 cd playlist
 touch README.md
 git add README.md
@@ -21,7 +21,7 @@ Existing folder
 -----------------------------------------------------------------------------------------
 cd existing_folder
 git init
-git remote add origin https://github.com/Gugatb/fic_panel_refresher.git
+git remote add origin https://github.com/Gugatb/panel-refresher-for-salesforce.git
 git add .
 git commit -m "Initial commit"
 git push -u origin master
@@ -31,7 +31,7 @@ Existing Git repository
 -----------------------------------------------------------------------------------------
 cd existing_repo
 git remote rename origin old-origin
-git remote add origin https://github.com/Gugatb/fic_panel_refresher.git
+git remote add origin https://github.com/Gugatb/panel-refresher-for-salesforce.git
 git push -u origin --all
 git push -u origin --tags
 
