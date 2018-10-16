@@ -16,8 +16,10 @@ Settings and notes
 Configure the data.ini file:  
 
 Diretorio = Chrome driver location  
+Fullscreen = Fullscreen mode  
 Senha = User password - Optional (Salesforce)  
 Usuario = Username - Optional (Salesforce)  
+Versao = Version - Classic or Lightning  
 
 Url = Url to panel page  
 Foco = Seconds to alternate the page  

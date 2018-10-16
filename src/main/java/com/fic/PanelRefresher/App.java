@@ -26,8 +26,10 @@ import com.fic.PanelRefresher.util.StringUtils;
 
 public class App {
 	public static String directory;
+	public static String fullscreen;
 	public static String password;
 	public static String username;
+	public static String version;
 	
 	public static Map<String, Integer> deadlines;
 	public static Map<String, WebDriver> drivers;
@@ -48,8 +50,10 @@ public class App {
 		panels = new HashMap<String, Integer>();
 		zooms = new HashMap<String, String>();
 		directory = "";
+		fullscreen = "";
 		password = "";
 		username = "";
+		version = "";
 		execute();
 	}
 	
@@ -61,17 +65,21 @@ public class App {
 	 * @param pId o id
 	 * @param pTag a etiqueta
 	 * @return true se contém, caso contrário false
-	 * 
 	 */
 	private static boolean contains(WebDriver pDriver, String pId, String pTag) {
 		boolean contains = false;
 		
-		for (WebElement element : pDriver.findElements(By.tagName(pTag))) {
-			String control = element.getAttribute("id");
-			
-			if (control != null && control.trim().equalsIgnoreCase(pId)) {
-				contains = true;
+		try {
+			for (WebElement element : pDriver.findElements(By.tagName(pTag))) {
+				String control = element.getAttribute("id");
+				
+				if (control != null && control.trim().equalsIgnoreCase(pId)) {
+					contains = true;
+				}
 			}
+		}
+		catch (Exception exception) {
+//			exception.printStackTrace();
 		}
 		return contains;
 	}
@@ -96,8 +104,10 @@ public class App {
 				
 				if (name.equals("Propriedades")) {
 					directory = map.get("Diretorio");
+					fullscreen = map.get("Fullscreen");
 					password = map.get("Senha");
 					username = map.get("Usuario");
+					version = map.get("Versao");
 				}
 				else {
 					String time = map.get("Minutos");
@@ -134,7 +144,8 @@ public class App {
 				
 				// Verificar quais páginas logaram.
 				for (WebDriver driver : drivers.values()) {
-					if (contains(driver, "AppBodyHeader", "div")) {
+					if ((contains(driver, "AppBodyHeader", "div") && isClassic()) ||
+						(contains(driver, "auraAppcacheProgress", "div") && isLightning())) {
 						counter++;
 					}
 					else if (username != null && !username.isEmpty() &&
@@ -204,6 +215,36 @@ public class App {
 	}
 	
 	/**
+	 * Verificar se a versão é clássico.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @return true se é clássico, caso contrário false
+	 */
+	public static boolean isClassic() {
+		return !isLightning();
+	}
+	
+	/**
+	 * Verificar se é fullscreen.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @return true se é fullscreen, caso contrário false
+	 */
+	public static boolean isFullscreen() {
+		return fullscreen != null && fullscreen.equalsIgnoreCase("true");
+	}
+	
+	/**
+	 * Verificar se a versão é lightning.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @return true se é lightning, caso contrário false
+	 */
+	public static boolean isLightning() {
+		return version != null && version.equalsIgnoreCase("lightning");
+	}
+	
+	/**
 	 * Logar na página.
 	 * @author Gugatb
 	 * @date 02/10/2018
@@ -231,7 +272,9 @@ public class App {
 				}
 			}
 		}
-		catch (Exception exception) { }
+		catch (Exception exception) {
+//			exception.printStackTrace();
+		}
 	}
 	
 	/**
@@ -242,12 +285,76 @@ public class App {
 	 * @param pName o nome
 	 */
 	private static void refresh(WebDriver pDriver, String pName) {
+		if (isClassic()) {
+			refreshClassic(pDriver, pName);
+		}
+		else {
+			refreshFrame(pDriver, pName);
+		}
+	}
+	
+	/**
+	 * Atualizar o painel.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @param pDriver o driver
+	 * @param pName o nome
+	 */
+	private static void refreshClassic(WebDriver pDriver, String pName) {
 		for (WebElement element : pDriver.findElements(By.tagName("span"))) {
 			String control = element.getAttribute("class");
 			String text = element.getText();
 			
 			if (control != null && text != null &&
 				control.trim().equalsIgnoreCase("menuButtonLabel") &&
+				text.trim().equalsIgnoreCase("Atualizar")) {
+				setZoom(pDriver, "1.0");
+				Actions actions = new Actions(pDriver);
+				actions.moveToElement(element).click().perform();
+				wait(pDriver, 30L);
+				removeElements(pDriver);
+				
+				System.out.println("[" + new Date() + "]: Página atualizada = " + pName);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Atualizar o painel.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @param pDriver o driver
+	 * @param pName o nome
+	 * sfxdash-1539698462518-672586
+	 */
+	private static void refreshFrame(WebDriver pDriver, String pName) {
+		if (pDriver.findElements(By.tagName("iframe")).size() > 0) {
+			for (WebElement frame : pDriver.findElements(By.tagName("iframe"))) {
+				pDriver.switchTo().frame(frame);
+				refreshLightning(pDriver, pName);
+			}
+		}
+		else {
+			refreshLightning(pDriver, pName);
+		}
+	}
+	
+	/**
+	 * Atualizar o painel.
+	 * @author Gugatb
+	 * @date 16/10/2018
+	 * @param pDriver o driver
+	 * @param pName o nome
+	 * sfxdash-1539698462518-672586
+	 */
+	private static void refreshLightning(WebDriver pDriver, String pName) {
+		for (WebElement element : pDriver.findElements(By.tagName("button"))) {
+			String control = element.getAttribute("class");
+			String text = element.getText();
+			
+			if (control != null && text != null &&
+				control.trim().equalsIgnoreCase("slds-button slds-button--neutral refresh") &&
 				text.trim().equalsIgnoreCase("Atualizar")) {
 				setZoom(pDriver, "1.0");
 				Actions actions = new Actions(pDriver);
@@ -288,9 +395,13 @@ public class App {
 	 * @param pDriver o driver
 	 */
 	private static void removeElements(WebDriver pDriver) {
-		// Remover os elementos.
-		removeElement(pDriver, "AppBodyHeader");
-		removeElement(pDriver, "section_header");
+		if (isClassic()) {
+			removeElement(pDriver, "AppBodyHeader");
+			removeElement(pDriver, "section_header");
+		}
+		else {
+			removeElement(pDriver, "oneHeader");
+		}
 	}
 	
 	/**
@@ -303,7 +414,7 @@ public class App {
 	private static void setZoom(WebDriver pDriver, String pZoom) {
 		try {
 			JavascriptExecutor js;
-			if (pDriver instanceof JavascriptExecutor) {
+			if (pDriver instanceof JavascriptExecutor && isClassic()) {
 				js = (JavascriptExecutor)pDriver;
 				js.executeScript("document.body.style.zoom = '" + pZoom +"'");
 			}
@@ -338,10 +449,13 @@ public class App {
 	 */
 	private static WebDriver setUp(String pDiverDirectory, String pUrl) {
 		System.setProperty("webdriver.chrome.driver", pDiverDirectory);
-		
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
-		driver.manage().window().fullscreen();
+		
+		if (isFullscreen()) {
+			driver.manage().window().fullscreen();
+		}
+		
 		driver.navigate().to(pUrl);
 		driver.get(pUrl);
 		wait(driver, 30L);
