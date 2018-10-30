@@ -425,21 +425,6 @@ public class App {
 	}
 	
 	/**
-	 * Dormir por um período.
-	 * @author Gugatb
-	 * @date 01/10/2018
-	 * @param pTime o tempo
-	 */
-	private static void sleep(long pTime) {
-		try {
-			Thread.sleep(pTime);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
 	 * Configurar o driver.
 	 * @author Gugatb
 	 * @date 01/10/2018
@@ -460,6 +445,21 @@ public class App {
 		driver.get(pUrl);
 		wait(driver, 30L);
 		return driver;
+	}
+	
+	/**
+	 * Dormir por um período.
+	 * @author Gugatb
+	 * @date 01/10/2018
+	 * @param pTime o tempo
+	 */
+	private static void sleep(long pTime) {
+		try {
+			Thread.sleep(pTime);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
