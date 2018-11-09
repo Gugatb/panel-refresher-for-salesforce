@@ -5,7 +5,7 @@ Proposal
 
 2. Periodically refresh the panel in minutes.
 
-3. Alterne a visualização do navegador.
+3. Switch your browser view.
 
 Technologies used
 -----------------------------------------------------------------------------------------
